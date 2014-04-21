@@ -18,6 +18,14 @@ will not work!
 Please refer to http://www.dokuwiki.org/plugins for additional info
 on how to install plugins in DokuWiki.
 
+Usage
+-----
+
+  {{NUMBEROFPAGES}}
+
+
+  {{NUMBEROFMEDIAS}}
+
 
 Copyright (C) S.C. Yoo <dryoo@live.com>
 
