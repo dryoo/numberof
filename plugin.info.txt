@@ -1,0 +1,7 @@
+base   numberof
+author S.C. Yoo
+email  dryoo@live.com
+date   2014-04-20
+name   numberof plugin
+desc   Simple plugin count the number of pages & media files in your Dokuwiki
+url    http://openwiki.kr/tech/numberof
