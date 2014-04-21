@@ -4,8 +4,11 @@ numberof Plugin for DokuWiki
 Simple plugin that counts the number of pages & media files in your Dokuwiki
 
 All documentation for this plugin can be found at
-http://openwiki.kr/tech/numberof
 
+  * http://openwiki.kr/tech/numberof (korean)
+  * https://www.dokuwiki.org/plugin:numberof  (English)
+ 
+  
 If you install this plugin manually, make sure it is installed in
 lib/plugins/numberof/ - if the folder is called different it
 will not work!
