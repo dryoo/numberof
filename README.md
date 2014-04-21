@@ -1,12 +1,9 @@
-numberof
-========
-
-Simple plugin count the number of pages &amp; media files in your Dokuwiki
 
 
 numberof Plugin for DokuWiki
+=========
 
-Simple plugin count the number of pages & media files in your Dokuwiki
+Simple plugin that count the number of pages & media files in your Dokuwiki
 
 All documentation for this plugin can be found at
 http://openwiki.kr/tech/numberof
