@@ -34,3 +34,5 @@ Usage
 
   {{NUMBEROFMEDIAS}}
 
+
+ * The counting is performed when you save the page. So values are not real-time.
