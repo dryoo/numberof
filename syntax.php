@@ -18,17 +18,20 @@ class syntax_plugin_numberof extends DokuWiki_Syntax_Plugin {
     }
  
     public function handle($match, $state, $pos, Doku_Handler &$handler){
-		global $conf;
+	global $conf;
         $list = array();
         $data=0;
         $match=substr($match,10,-2);
-        switch ($match) {
+        $matches=explode(">",$match);
+        $matches[1]=str_replace(":","/",$matches[1]);
+        switch ($matches[0]) {
             case "PAGES":
-                search($list,$conf['datadir'],array($this,'_search_count'),array('all'=>false),'');
+                search($list,$conf['datadir'].$matches[1],array($this,'_search_count'),array('all'=>false),'');
                 $data = $list['file_count'];
                 break;
+               
             case "MEDIAS":
-                search($list,$conf['mediadir'],array($this,'_search_count'),array('all'=>true));
+                search($list,$conf['mediadir'].$matches[1],array($this,'_search_count'),array('all'=>true));
                 $data    = $list['file_count'];
                 break;
           }
