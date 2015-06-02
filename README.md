@@ -34,8 +34,12 @@ Usage
 
   {{NUMBEROFPAGES}}
 
-
   {{NUMBEROFMEDIAS}}
 
+
+
+  {{NUMBEROFPAGES>:game}} 
+
+  {{NUMBEROFMEDIAS>:game}} 
 
  * The counting is performed when you save the page. So values are not real-time.
