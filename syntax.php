@@ -17,7 +17,7 @@ class syntax_plugin_numberof extends DokuWiki_Syntax_Plugin {
       $this->Lexer->addSpecialPattern('\{\{NUMBEROF[^\}]*\}\}',$mode,'plugin_numberof');
     }
  
-    public function handle($match, $state, $pos, Doku_Handler &$handler){
+    public function handle($match, $state, $pos, Doku_Handler $handler){
 	global $conf;
         $list = array();
         $data=0;
@@ -38,7 +38,7 @@ class syntax_plugin_numberof extends DokuWiki_Syntax_Plugin {
         return $data;
     }
 
-    public function render($mode, Doku_Renderer &$renderer, $data) {
+    public function render($mode, Doku_Renderer $renderer, $data) {
         if($mode != 'xhtml') return false;
         $renderer->doc.= $data;
         return true;
