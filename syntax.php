@@ -38,7 +38,14 @@ class syntax_plugin_numberof extends DokuWiki_Syntax_Plugin {
 
     public function render($mode, Doku_Renderer $renderer, $data) {
         if ($mode != 'xhtml') return false;
-        $renderer->doc .= $this->count($data['type'] ?? '', $data['ns'] ?? '');
+
+        // instructions cached by an older plugin version only carry the number
+        if (!isset($data['type'])) {
+            $renderer->doc .= (int) ($data['count'] ?? 0);
+            return true;
+        }
+
+        $renderer->doc .= $this->count($data['type'], $data['ns'] ?? '');
         return true;
     }
 
