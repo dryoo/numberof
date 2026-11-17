@@ -25,15 +25,25 @@ class syntax_plugin_numberof extends DokuWiki_Syntax_Plugin {
             'dir_nest' => 0,
         );
         $match=substr($match,10,-2);
-        $matches = sexplode(">", $match, 2, '');
-        $matches[1]=str_replace(":","/",$matches[1]);
-        switch ($matches[0]) {
+
+        // accept both ">" (classic) and ":" (natural namespace separator)
+        if (!preg_match('/^(PAGES|MEDIAS)\s*(?:[>:]\s*(.*))?$/us', $match, $m)) {
+            return ['count' => 0];
+        }
+
+        $type = $m[1];
+        $ns   = isset($m[2]) ? trim($m[2], " \t\n\r\0\x0B:") : '';
+
+        // normalise the namespace and encode it for the configured fnencode setting
+        $rel = $ns === '' ? '' : utf8_encodeFN(str_replace(':', '/', cleanID($ns)));
+
+        switch ($type) {
             case "PAGES":
-                search($list,$conf['datadir'].$matches[1],array($this,'_search_count'),array('all'=>false),'');
+                search($list,$conf['datadir'],array($this,'_search_count'),array('all'=>false),$rel);
                 break;
 
             case "MEDIAS":
-                search($list,$conf['mediadir'].$matches[1],array($this,'_search_count'),array('all'=>true));
+                search($list,$conf['mediadir'],array($this,'_search_count'),array('all'=>true),$rel);
                 break;
           }
         return ['count' => $list['file_count']];
