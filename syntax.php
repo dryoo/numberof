@@ -17,42 +17,74 @@ class syntax_plugin_numberof extends DokuWiki_Syntax_Plugin {
       $this->Lexer->addSpecialPattern('\{\{NUMBEROF[^\}]*\}\}',$mode,'plugin_numberof');
     }
 
+    /**
+     * Only parse the tag here. Counting happens in render() so that a page
+     * using ~~NOCACHE~~ always shows current numbers: render() is called again
+     * on every request, while handle() only runs when the instructions are
+     * rebuilt.
+     */
     public function handle($match, $state, $pos, Doku_Handler $handler){
-	global $conf;
-        $list = array(
-            'file_count' => 0,
-            'dir_count' => 0,
-            'dir_nest' => 0,
-        );
-        $match=substr($match,10,-2);
+        $match = substr($match, 10, -2);
 
         // accept both ">" (classic) and ":" (natural namespace separator)
         if (!preg_match('/^(PAGES|MEDIAS)\s*(?:[>:]\s*(.*))?$/us', $match, $m)) {
-            return ['count' => 0];
+            return ['type' => '', 'ns' => ''];
         }
 
-        $type = $m[1];
-        $ns   = isset($m[2]) ? trim($m[2], " \t\n\r\0\x0B:") : '';
+        $ns = isset($m[2]) ? trim($m[2], " \t\n\r\0\x0B:") : '';
 
-        // normalise the namespace and encode it for the configured fnencode setting
-        $rel = $ns === '' ? '' : utf8_encodeFN(str_replace(':', '/', cleanID($ns)));
-
-        switch ($type) {
-            case "PAGES":
-                search($list,$conf['datadir'],array($this,'_search_count'),array('all'=>false),$rel);
-                break;
-
-            case "MEDIAS":
-                search($list,$conf['mediadir'],array($this,'_search_count'),array('all'=>true),$rel);
-                break;
-          }
-        return ['count' => $list['file_count']];
+        return ['type' => $m[1], 'ns' => $ns];
     }
 
     public function render($mode, Doku_Renderer $renderer, $data) {
-        if($mode != 'xhtml') return false;
-        $renderer->doc .= $data['count'];
+        if ($mode != 'xhtml') return false;
+        $renderer->doc .= $this->count($data['type'] ?? '', $data['ns'] ?? '');
         return true;
+    }
+
+    /**
+     * Count the pages or media files, optionally limited to a namespace.
+     */
+    protected function count($type, $ns)
+    {
+        global $conf;
+
+        static $memo = [];
+        $key = $type . ':' . $ns;
+        if (isset($memo[$key])) {
+            return $memo[$key];
+        }
+
+        if ($type !== 'PAGES' && $type !== 'MEDIAS') {
+            return $memo[$key] = 0;
+        }
+
+        $ttl = (int) $this->getConf('cache_time');
+        $cache = null;
+        if ($ttl > 0) {
+            $cache = new \dokuwiki\Cache\Cache('numberof_' . md5($key), '.count');
+            if ($cache->useCache(['age' => $ttl])) {
+                return $memo[$key] = (int) $cache->retrieveCache();
+            }
+        }
+
+        $list = [
+            'file_count' => 0,
+            'dir_count'  => 0,
+            'dir_nest'   => 0,
+        ];
+
+        // normalise the namespace and encode it for the configured fnencode setting
+        $rel = $ns === '' ? '' : utf8_encodeFN(str_replace(':', '/', cleanID($ns)));
+        $base = ($type === 'PAGES') ? $conf['datadir'] : $conf['mediadir'];
+
+        search($list, $base, [$this, '_search_count'], ['all' => $type === 'MEDIAS'], $rel);
+
+        if ($cache) {
+            $cache->storeCache($list['file_count']);
+        }
+
+        return $memo[$key] = $list['file_count'];
     }
 
     function _search_count(&$data,$base,$file,$type,$lvl,$opts){

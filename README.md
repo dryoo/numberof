@@ -42,4 +42,7 @@ Usage
 
   {{NUMBEROFMEDIAS>:game}} 
 
- * The counting is performed when you save the page. So values are not real-time.
+ * The count is made while the page is rendered. Add ~~NOCACHE~~ to the page if
+   it should show up to date numbers on every request instead of whenever
+   DokuWiki rebuilds its cache.
+
